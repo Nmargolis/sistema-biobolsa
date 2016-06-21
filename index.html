@@ -11,23 +11,29 @@
   <body>
     <div id="map"></div>
     <script>
+
+      var map;
+      var infowindow;
+
       function initMap() {
         var mapDiv = document.getElementById('map');
 
         var mapOptions = {
             center: {lat: 19.432608, lng: -99.133209},
-            zoom: 11,
+            zoom: 14,
             styles: [{"featureType":"landscape.natural","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"color":"#e0efef"}]},{"featureType":"poi","elementType":"geometry.fill","stylers":[{"visibility":"on"},{"hue":"#1900ff"},{"color":"#c0e8e8"}]},{"featureType":"road","elementType":"geometry","stylers":[{"lightness":100},{"visibility":"simplified"}]},{"featureType":"road","elementType":"labels","stylers":[{"visibility":"off"}]},{"featureType":"transit.line","elementType":"geometry","stylers":[{"visibility":"on"},{"lightness":700}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#7dcdcd"}]}]
         };
 
-        var map = new google.maps.Map(mapDiv, mapOptions);
+        map = new google.maps.Map(mapDiv, mapOptions);
 
         geolocate(map);
+
+        findLocations(map);
 
       }
 
       function geolocate(map) {
-        var infoWindow = new google.maps.InfoWindow({map: map});
+        infoWindow = new google.maps.InfoWindow({map: map});
 
           // Try HTML5 geolocation.
           if (navigator.geolocation) {
@@ -57,9 +63,68 @@
       }
 
 
+
+      function findLocations(map) {
+
+        // Bancomer (a bank), Telecomm (a telegraph shop w/ payment options), Oxxo (a convenience store with payment options) ).
+
+        console.log('finding locations');
+        var request = {
+            location: map.center,
+            radius: '800',
+            name: 'Telecom'
+          };
+
+
+        var request2 = {
+            location: map.center,
+            radius: '800',
+            name: 'Bancomer',
+          };
+
+        var request3 = {
+            location: map.center,
+            radius: '800',
+            name: 'Oxxo',
+        }
+        
+        service = new google.maps.places.PlacesService(map);
+        service.nearbySearch(request, callback);
+        service.nearbySearch(request2, callback);
+        service.nearbySearch(request3, callback);
+
+        
+        function callback(results, status) {
+          // console.log(results);
+          if (status == google.maps.places.PlacesServiceStatus.OK) {
+            for (var i = 0; i < results.length; i++) {
+              var place = results[i];
+              createMarker(results[i], map);
+            }
+          }
+        }
+
+      }
+
+      function createMarker(place, map) {
+        infowindow = new google.maps.InfoWindow({map: map});
+        // console.log(infowindow);
+        console.log(place.name);
+        var placeLoc = place.geometry.location;
+        var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.setContent(place.name);
+          infowindow.open(map, this);
+        });
+      }
+
     </script>
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNv8EusJbOIBS7rvMAQgfFyJROSL87KO8&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNv8EusJbOIBS7rvMAQgfFyJROSL87KO8&libraries=places&callback=initMap">
     </script>
 
   </body>
