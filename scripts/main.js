@@ -38,7 +38,6 @@ var mainMod =(function(window, undefined) {
 
       function geolocate(map) {
         
-
           // Try HTML5 geolocation.
           if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
@@ -110,7 +109,7 @@ var mainMod =(function(window, undefined) {
               var place = results[i];
 
               // Filter out permanently closed places
-              if (place.permanently_closed == true) {
+              if (place.permanently_closed === true) {
                   console.log(place.name + ' is permanently closed.');
               }
               else if (place.name.toLowerCase().indexOf('cajero') != -1) {
